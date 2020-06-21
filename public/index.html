@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Awesome Shop</title>
+    <link rel="stylesheet" href="stylesheets/style.css">
+</head>
+<body>
+    <main>
+        <div class="container">
+            <form action="/webpayplus/create" method="POST">
+                <label class="label">Webpay</label>
+                <figure class="image is-2by3">
+                    <img src='https://images.unsplash.com/photo-1517423568366-8b83523034fd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60' alt="" srcset="">
+                </figure>
+                <button class="button is-success" type="submit">
+                    Comprar por 9.990
+                </button>
+                <input type="hidden" name="amount" value="9990">
+                <input type="hidden" name="buyOrder" value="1">
+                <input type="hidden" name="buyOrder" value="1">
+                <input type="hidden" name="sessionId" value="mi-id-de-sesion">
+                <input type="hidden" name="returnUrl" value="https://localhost/webpayplus/returnUrl">
+                <!-- <input type="hidden" name="finalURL" value="https://localhost/webpayplus/returnUrl"> -->
+            </form>
+        </div>
+    </main>
+    </body>
+</html>
