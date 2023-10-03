@@ -12,6 +12,6 @@
     "http-errors": "~1.6.3",
     "mongoose": "^5.13.20",
     "morgan": "~1.9.1",
-    "transbank-sdk": "^1.0.2"
+    "transbank-sdk": "^4.0.0"
   }
 }
