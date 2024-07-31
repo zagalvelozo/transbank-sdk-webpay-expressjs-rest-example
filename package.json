@@ -8,10 +8,10 @@
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
-    "express": "~4.16.1",
+    "express": "~4.18.2",
     "http-errors": "~1.6.3",
-    "mongoose": "^5.9.16",
+    "mongoose": "^5.13.20",
     "morgan": "~1.9.1",
-    "transbank-sdk": "^1.0.2"
+    "transbank-sdk": "^5.0.0"
   }
 }
