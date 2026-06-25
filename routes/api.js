@@ -1,6 +1,4 @@
 var express = require('express');
-var Transbank = require('transbank-sdk');
-const configuration = require('../config/Webpay'); //Only for production
 var router = express.Router();
 
 

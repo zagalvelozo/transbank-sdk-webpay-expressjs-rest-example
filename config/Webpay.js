@@ -1,7 +1,4 @@
-var Transbank = require('transbank-sdk');
-
-const configuration = new Transbank.Configuration();
-configuration.usingEnvironment(Transbank.environments.production);
+const configuration = {};
 configuration.commerceCode = '597020000540';
 configuration.commerceEmail = 'example@shop.com'
 configuration.privateCert =  `-----BEGIN RSA PRIVATE KEY-----
