@@ -1,64 +1,48 @@
-var express = require('express');
+const express = require('express');
+const { WebpayPlus, Options, Environment, IntegrationApiKeys, IntegrationCommerceCodes } = require('transbank-sdk');
+const logger = require('../config/logger');
 var router = express.Router();
 
+const tx = new WebpayPlus.Transaction(new Options(
+  IntegrationCommerceCodes.WEBPAY_PLUS,
+  IntegrationApiKeys.WEBPAY,
+  Environment.Integration
+));
 
-router.post('/webpayplus/create', function (req, res) {
-  const transaction = new Transbank.Webpay(
-    Transbank.Configuration.forTestingWebpayPlusNormal()
-  ).getNormalTransaction();
-  const amount = req.query.amount;
-  const sessionId = req.query.sessionId
-  const buyOrder = req.query.buyOrder;
-  const returnUrl = req.query.returnUrl;
-  const finalURL = req.query.finalURL || req.query.returnUrl;
-  transaction.initTransaction(amount, buyOrder, sessionId, returnUrl, finalURL)
-    .then((response) => {
-      const token = response.token;
-      const url =  response.url;
-      res.redirect(302, `${url}?token_ws=${token}`);
-    })
-    .catch((error) => {
-      res.json(error);
-    });
+router.post('/webpayplus/create', async (req, res) => {
+  const { amount, sessionId, buyOrder, returnUrl } = req.body;
+  logger.info('creating webpay transaction', { buyOrder, sessionId, amount, returnUrl });
+
+  try {
+    const response = await tx.create(buyOrder, sessionId, amount, returnUrl);
+    const { token, url } = response;
+    logger.info('webpay transaction created', { buyOrder, token });
+    res.redirect(302, `${url}?token_ws=${token}`);
+  } catch (error) {
+    logger.error('webpay create failed', { buyOrder, error: error.message });
+    res.status(500).json({ error: error.message });
+  }
 });
 
-router.post('/webpayplus/returnUrl', function (req, res) {
-  const transaction = new Transbank.Webpay(
-    Transbank.Configuration.forTestingWebpayPlusNormal()
-  ).getNormalTransaction();
-  const token = req.body.token_ws;
-  transaction.getTransactionResult(token)
-    .then((response) => {
-      const output = response.detailOutput[0];
-      if (output.responseCode === 0) {
-        res.json(output); //accepted
-      } else {
-        res.json(output); //rejected
-      }
-    })
-    .catch((error) => {
-      res.json(error)
-    });
-});
+router.post('/webpayplus/commit', async (req, res) => {
+  const token = req.body.token_ws || req.query.token_ws;
+  logger.info('committing webpay transaction', { token });
 
-router.post('/webpayplus/returnUrl', function (req, res) {
-  const transaction = new Transbank.Webpay(
-    Transbank.Configuration.forTestingWebpayPlusNormal()
-  ).getNormalTransaction();
-  const token = req.body.token_ws;
-  transaction.getTransactionResult(token)
-    .then((response) => {
-      const output = response.detailOutput[0];
-      if (output.responseCode === 0) {
-        res.json(output); //accepted
-      } else {
-        res.json(output); //rejected
-      }
-    })
-    .catch((error) => {
-      res.json(error)
-    });
-});
+  try {
+    const response = await tx.commit(token);
+    const { vci, amount, status, buy_order, session_id, card_detail, transaction_date, authorization_code, payment_type_code, response_code } = response;
 
+    if (response_code === 0) {
+      logger.info('webpay transaction committed', { buy_order, authorization_code, amount });
+      res.json({ status, authorization_code, amount, buy_order, payment_type_code });
+    } else {
+      logger.warn('webpay transaction rejected', { buy_order, response_code });
+      res.status(400).json({ status, response_code, buy_order });
+    }
+  } catch (error) {
+    logger.error('webpay commit failed', { token, error: error.message });
+    res.status(500).json({ error: error.message });
+  }
+});
 
 module.exports = router;
